@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "src\ApiGateway\ApiGateway.csproj", "{85E723E6-D6A1-4690-B595-CA37A80836A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "src\ApiGateway\ApiGateway.csproj", "{85E723E6-D6A1-4690-B595-CA37A80836A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lighthouse", "src\Lighthouse\Lighthouse.csproj", "{285B48E0-41ED-4CF7-96EB-E5357E75FD33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{85E723E6-D6A1-4690-B595-CA37A80836A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85E723E6-D6A1-4690-B595-CA37A80836A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85E723E6-D6A1-4690-B595-CA37A80836A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{285B48E0-41ED-4CF7-96EB-E5357E75FD33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{285B48E0-41ED-4CF7-96EB-E5357E75FD33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{285B48E0-41ED-4CF7-96EB-E5357E75FD33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{285B48E0-41ED-4CF7-96EB-E5357E75FD33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
