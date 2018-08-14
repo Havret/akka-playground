@@ -1,0 +1,6 @@
+delete from [InventoryManagement].[dbo].[EventJournal]
+delete from [InventoryManagement].[dbo].[Metadata]
+delete from [InventoryManagement].[dbo].[ShardingJournal]
+delete from [InventoryManagement].[dbo].[ShardingMetadata]
+delete from [InventoryManagement].[dbo].[ShardingSnapshotStore]
+delete from [InventoryManagement].[dbo].[SnapshotStore]

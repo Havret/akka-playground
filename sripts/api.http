@@ -1,0 +1,16 @@
+@api = https://localhost:5001
+
+### Create new book
+POST {{api}}/api/books
+content-type: application/json
+
+{
+    "title": "New Awesome Book2",
+    "author": "Marian Bubak",
+    "tags": ["new", "tag"],
+    "cost": 500,
+    "inventoryAmount": 20
+}
+### Get book
+@bookId = 5db6f8c0-4f87-4c33-bc80-f20cdf4a2f4a
+GET {{api}}/api/books/{{bookId}}
