@@ -3,7 +3,7 @@ using FluentValidation;
 using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
 
-namespace InventoryManagement.Domain
+namespace InventoryManagement.Domain.Book.Validation
 {
     public class CreateBookValidator : AbstractValidator<CreateBook>
     {

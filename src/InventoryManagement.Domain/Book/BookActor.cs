@@ -1,3 +1,4 @@
+using System;
 using Akka.Actor;
 using Akka.Event;
 using Akka.Persistence;
@@ -5,13 +6,12 @@ using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
 using InventoryManagement.Contact.Events;
 using InventoryManagement.Contact.Query;
-using System;
 
-namespace InventoryManagement.Domain
+namespace InventoryManagement.Domain.Book
 {
     public class BookActor : ReceivePersistentActor
     {
-        private readonly Book _state = new Book();
+        private readonly BookAggregate _aggregate = new BookAggregate();
         private readonly ILoggingAdapter _logger = Context.GetLogger();
         public override string PersistenceId { get; }
 
@@ -34,7 +34,7 @@ namespace InventoryManagement.Domain
                 Persist(bookCreated, _ =>
                 {
                     _logger.Info($"Book created: {bookCreated}");
-                    _state.Apply(bookCreated);
+                    _aggregate.Apply(bookCreated);
                 });
             });
 
@@ -42,17 +42,17 @@ namespace InventoryManagement.Domain
             {
                 var bookDto = new BookDto
                 (
-                    id: _state.Id,
-                    title: _state.Title,
-                    author: _state.Author,
-                    tags: _state.Tags,
-                    cost: _state.Cost
+                    id: _aggregate.Id,
+                    title: _aggregate.Title,
+                    author: _aggregate.Author,
+                    tags: _aggregate.Tags,
+                    cost: _aggregate.Cost
                 );
 
                 Sender.Tell(bookDto);
             });
 
-            Recover<BookCreated>(bookCreated => _state.Apply(bookCreated));
+            Recover<BookCreated>(bookCreated => _aggregate.Apply(bookCreated));
         }
     }
 }

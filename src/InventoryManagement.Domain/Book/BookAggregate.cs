@@ -1,10 +1,10 @@
-﻿using InventoryManagement.Contact.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using InventoryManagement.Contact.Events;
 
-namespace InventoryManagement.Domain
+namespace InventoryManagement.Domain.Book
 {
-    public class Book : ICloneable
+    public class BookAggregate : ICloneable
     {
         public Guid Id { get; private set; }
         public string Title { get; private set; }
