@@ -4,8 +4,9 @@ using Akka.Event;
 using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
 using InventoryManagement.Contact.Query;
+using InventoryManagement.Domain.Book.Validation;
 
-namespace InventoryManagement.Domain
+namespace InventoryManagement.Domain.Book
 {
     public class BookValidationProxyActor : ReceiveActor
     {

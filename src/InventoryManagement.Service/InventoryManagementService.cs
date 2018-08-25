@@ -3,7 +3,8 @@ using Akka.Actor;
 using Akka.Cluster.Sharding;
 using Infrastructure.Config;
 using Infrastructure.Sharding;
-using InventoryManagement.Domain;
+using InventoryManagement.Domain.Book;
+using InventoryManagement.Domain.Book.Validation;
 
 namespace InventoryManagement.Service
 {
