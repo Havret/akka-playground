@@ -2,7 +2,7 @@
 {
     public class ProjectionOffset
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public long Offset { get; set; }
     }
 }

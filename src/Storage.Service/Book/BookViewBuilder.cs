@@ -25,14 +25,19 @@ namespace Storage.Service.Book
 
             var self = Self;
 
+            SqlReadJournal queries = PersistenceQuery.Get(Context.System)
+                .ReadJournalFor<SqlReadJournal>(SqlReadJournal.Identifier);
             Receive<Option<long>>(option =>
             {
-                SqlReadJournal queries = PersistenceQuery.Get(Context.System)
-                    .ReadJournalFor<SqlReadJournal>(SqlReadJournal.Identifier);
                 var materializer = ActorMaterializer.Create(Context.System);
                 var eventsByTag = queries.EventsByTag("book", new Sequence(option.Value));
                 eventsByTag
                     .SelectAsync(1, x => self.Ask(x))
+                    .Recover(exception =>
+                    {
+                        Console.WriteLine(exception);
+                        return Option<object>.None;
+                    })
                     .Select(x => (Sequence)x)
                     .SelectAsync(1, x => _resumableProjection.StoreLatestOffset("book-view", x.Value))
                     .RunWith(Sink.Ignore<bool>(), materializer);

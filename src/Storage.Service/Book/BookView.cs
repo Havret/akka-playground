@@ -1,27 +1,34 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Akka.Actor;
+﻿using Akka.Actor;
 using InventoryManagement.Contact.Dto;
 using InventoryManagement.Contact.Query;
 using MongoDB.Driver;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Storage.Service.Book
 {
     public class BookView : ReceiveActor
     {
+        private readonly StorageContext _storageContext;
+
         public BookView()
         {
-            var storageContext = new StorageContext();
+            _storageContext = new StorageContext();
 
-            Receive<GetBooks>(getBooks =>
+            Receive<GetBooks>(query =>
             {
-                storageContext.Books.FindAsync(FilterDefinition<BookReadModel>.Empty).PipeTo(recipient: Self, sender: Sender);
+                var filterDefinition = FilterDefinition<BookReadModel>.Empty;
+                if (!string.IsNullOrEmpty(query.Tag))
+                    filterDefinition &= new ExpressionFilterDefinition<BookReadModel>(x => x.Tags.Contains(query.Tag));
+
+                FindBooks(filterDefinition).PipeTo(recipient: Self, sender: Sender);
             });
 
-            Receive<IAsyncCursor<BookReadModel>>(cursor =>
+            Receive<IEnumerable<BookReadModel>>(books =>
             {
-                BookDto[] bookDtos = cursor.ToList().Select(x => new BookDto(
+                var bookDtos = books.Select(x => new BookDto
+                (
                     id: x.Id,
                     title: x.Title,
                     author: x.Author,
@@ -31,6 +38,12 @@ namespace Storage.Service.Book
 
                 Sender.Tell(bookDtos);
             });
+        }
+
+        private async Task<IEnumerable<BookReadModel>> FindBooks(FilterDefinition<BookReadModel> filterDefinition)
+        {
+            var result = await _storageContext.Books.FindAsync(filterDefinition);
+            return await result.ToListAsync();
         }
     }
 }
