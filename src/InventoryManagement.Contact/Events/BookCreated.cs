@@ -24,6 +24,6 @@ namespace InventoryManagement.Contact.Events
         public int InventoryAmount { get; }
 
         public override string ToString() =>
-            $"{nameof(Id)}: {Id}, {nameof(Title)}: {Title}, {nameof(Author)}: {Author}, {nameof(Tags)}: {Tags}, {nameof(Cost)}: {Cost}, {nameof(InventoryAmount)}: {InventoryAmount}";
+            $"[{nameof(BookCreated)}] {nameof(Id)}: {Id}, {nameof(Title)}: {Title}, {nameof(Author)}: {Author}, {nameof(Tags)}: {Tags.ToString()}, {nameof(Cost)}: {Cost}, {nameof(InventoryAmount)}: {InventoryAmount}";
     }
 }

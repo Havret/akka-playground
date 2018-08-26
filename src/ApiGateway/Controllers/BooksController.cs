@@ -52,5 +52,13 @@ namespace ApiGateway.Controllers
             _bookActor.Tell(new ShardEnvelope(command.Id.ToString(), command));
             return Accepted();
         }
+
+        [HttpDelete("{id}/tag")]
+        public IActionResult RemoveTag(Guid id, RemoveTag command)
+        {
+            command = command.WithId(id);
+            _bookActor.Tell(new ShardEnvelope(command.Id.ToString(), command));
+            return Accepted();
+        }
     }
 }

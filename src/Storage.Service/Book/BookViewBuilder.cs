@@ -51,9 +51,9 @@ namespace Storage.Service.Book
 
                     var updateOptions = new UpdateOptions { IsUpsert = true };
 
-                    _storageContext.Books.UpdateOneAsync(x => x.Id == bookCreated.Id, updateDefinition, updateOptions)
-                        .PipeTo(Sender,
-                            Self, () => envelope.Offset, exception => new Status.Failure(exception));
+                    _storageContext.Books
+                        .UpdateOneAsync(x => x.Id == bookCreated.Id, updateDefinition, updateOptions)
+                        .PipeTo(Sender, Self, () => envelope.Offset, exception => new Status.Failure(exception));
                 })
                 .With<TagAdded>(tagAdded =>
                 {
@@ -63,6 +63,16 @@ namespace Storage.Service.Book
 
                     _storageContext.Books
                         .FindOneAndUpdateAsync(ShouldBeApplied(tagAdded.Id, envelope.SequenceNr), updateDefinition)
+                        .PipeTo(Sender, Self, () => envelope.Offset, exception => new Status.Failure(exception));
+                })
+                .With<TagRemoved>(tagRemoved =>
+                {
+                    var updateDefinition = new UpdateDefinitionBuilder<BookReadModel>()
+                        .Pull(model => model.Tags, tagRemoved.Tag)
+                        .Set(model => model.SequenceNr, envelope.SequenceNr);
+
+                    _storageContext.Books
+                        .FindOneAndUpdateAsync(ShouldBeApplied(tagRemoved.Id, envelope.SequenceNr), updateDefinition)
                         .PipeTo(Sender, Self, () => envelope.Offset, exception => new Status.Failure(exception));
                 })
             );

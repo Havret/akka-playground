@@ -39,16 +39,22 @@ namespace InventoryManagement.Domain.Book
 
             Command<AddTag>(addTag =>
             {
-                var tagAdded = new TagAdded
-                (
-                    id: addTag.Id,
-                    tag: addTag.Tag
-                );
+                var tagAdded = new TagAdded(id: addTag.Id, tag: addTag.Tag);
 
                 Persist(tagAdded, _ =>
                 {
                     _logger.Info(tagAdded.ToString());
                     _aggregate.Apply(tagAdded);
+                });
+            });
+
+            Command<RemoveTag>(removeTag =>
+            {
+                var tagRemoved = new TagRemoved(id: removeTag.Id, tag: removeTag.Tag);
+                Persist(tagRemoved, _ =>
+                {
+                    _logger.Info(tagRemoved.ToString());
+                    _aggregate.Apply(tagRemoved);
                 });
             });
 
@@ -68,6 +74,7 @@ namespace InventoryManagement.Domain.Book
 
             Recover<BookCreated>(bookCreated => _aggregate.Apply(bookCreated));
             Recover<TagAdded>(tagAdded => _aggregate.Apply(tagAdded));
+            Recover<TagRemoved>(tagRemoved => _aggregate.Apply(tagRemoved));
         }
     }
 }

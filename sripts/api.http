@@ -1,26 +1,33 @@
 @api = https://localhost:5001
-@bookId = a064071c-6c57-42b8-b629-c3c1c6993ab1
+@bookId = fe03919f-b708-491c-9d97-a8ea49a16968
 
 ### Create new book
 POST {{api}}/api/books
 content-type: application/json
 
 {
-    "title": "Super new book",
-    "author": "Marian Bubak",
-    "tags": ["new", "tag"],
+    "title": "Domain-driven design",
+    "author": "Eric J. Evans",
+    "tags": ["new"],
     "cost": 500,
     "inventoryAmount": 20
 }
 ### Get book
 GET {{api}}/api/books/{{bookId}}
 
-
 ### Get books
 GET {{api}}/api/books
 
 ### Add Tag
 POST {{api}}/api/books/{{bookId}}/tag
+content-type: application/json
+
+{
+    "tag": "super"
+}
+
+### Remove Tag
+DELETE  {{api}}/api/books/{{bookId}}/tag
 content-type: application/json
 
 {
