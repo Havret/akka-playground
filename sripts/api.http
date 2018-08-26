@@ -1,20 +1,28 @@
 @api = https://localhost:5001
+@bookId = a064071c-6c57-42b8-b629-c3c1c6993ab1
 
 ### Create new book
 POST {{api}}/api/books
 content-type: application/json
 
 {
-    "title": "New dfghjhj",
+    "title": "Super new book",
     "author": "Marian Bubak",
     "tags": ["new", "tag"],
     "cost": 500,
     "inventoryAmount": 20
 }
 ### Get book
-@bookId = 5db6f8c0-4f87-4c33-bc80-f20cdf4a2f4a
 GET {{api}}/api/books/{{bookId}}
 
 
 ### Get books
 GET {{api}}/api/books
+
+### Add Tag
+POST {{api}}/api/books/{{bookId}}/tag
+content-type: application/json
+
+{
+    "tag": "super"
+}

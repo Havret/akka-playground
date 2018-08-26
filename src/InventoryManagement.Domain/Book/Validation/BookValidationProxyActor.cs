@@ -1,13 +1,14 @@
 ﻿using Akka;
 using Akka.Actor;
 using Akka.Event;
+using Infrastructure;
 using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
 using InventoryManagement.Contact.Query;
 
 namespace InventoryManagement.Domain.Book.Validation
 {
-    public class BookValidationProxyActor : ReceiveActor
+    public class BookValidationProxyActor : ReceiveActor, IWithUnboundedStash
     {
         private readonly IActorRef _bookNameGuard;
         private readonly IActorRef _bookActor;
@@ -20,6 +21,8 @@ namespace InventoryManagement.Domain.Book.Validation
             Become(Idle);
         }
 
+        public IStash Stash { get; set; }
+
         private void Idle()
         {
             Receive<CreateBook>(createBook =>
@@ -27,6 +30,12 @@ namespace InventoryManagement.Domain.Book.Validation
                 _bookNameGuard.Tell(new BookNameGuardActor.CheckBookTitleAvailability(createBook.Title));
                 _bookActor.Tell(GetBook.Instance);
                 Become(ValidateCreateBook(createBook, new CreateBookValidator()));
+            });
+
+            Receive<AddTag>(addTag =>
+            {
+                _bookActor.Tell(GetBook.Instance);
+                Become(ValidateAddTag(addTag, new AddTagValidator()));
             });
 
             ReceiveAny(Forward);
@@ -37,6 +46,7 @@ namespace InventoryManagement.Domain.Book.Validation
              message.Match()
                  .With<BookNameGuardActor.BookTitleAvailability>(x => validator.BookTitleAvailable = x.IsAvailable)
                  .With<BookDto>(x => validator.Book = x)
+                 .With<ICommand>(_ => Stash.Stash())
                  .Default(Forward);
 
              if (validator.IsReady)
@@ -47,13 +57,32 @@ namespace InventoryManagement.Domain.Book.Validation
                  else
                      _logger.Info(result.ToString());
 
+                 Stash.UnstashAll();
                  Become(Idle);
              }
          };
 
-        private void Forward(object message)
+        private UntypedReceive ValidateAddTag(AddTag command, AddTagValidator validator) => message =>
         {
-            _bookActor.Forward(message);
-        }
+            message.Match()
+                .With<BookDto>(x => validator.Book = x)
+                .With<ICommand>(_ => Stash.Stash())
+                .Default(Forward);
+
+            if (validator.IsReady)
+            {
+                var result = validator.Validate(command);
+                if (result.IsValid)
+                    Forward(command);
+                else
+                    _logger.Info(result.ToString());
+
+                Stash.UnstashAll();
+                Become(Idle);
+            }
+        };
+
+        private void Forward(object message) => _bookActor.Forward(message);
+        
     }
 }

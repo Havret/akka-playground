@@ -37,6 +37,21 @@ namespace InventoryManagement.Domain.Book
                 });
             });
 
+            Command<AddTag>(addTag =>
+            {
+                var tagAdded = new TagAdded
+                (
+                    id: addTag.Id,
+                    tag: addTag.Tag
+                );
+
+                Persist(tagAdded, _ =>
+                {
+                    _logger.Info(tagAdded.ToString());
+                    _aggregate.Apply(tagAdded);
+                });
+            });
+
             Command<GetBook>(getBook =>
             {
                 var bookDto = new BookDto
@@ -44,7 +59,7 @@ namespace InventoryManagement.Domain.Book
                     id: _aggregate.Id,
                     title: _aggregate.Title,
                     author: _aggregate.Author,
-                    tags: _aggregate.Tags,
+                    tags: _aggregate.Tags ?? new string[] { },
                     cost: _aggregate.Cost
                 );
 
@@ -52,6 +67,7 @@ namespace InventoryManagement.Domain.Book
             });
 
             Recover<BookCreated>(bookCreated => _aggregate.Apply(bookCreated));
+            Recover<TagAdded>(tagAdded => _aggregate.Apply(tagAdded));
         }
     }
 }
