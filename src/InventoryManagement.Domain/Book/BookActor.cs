@@ -1,4 +1,3 @@
-using System;
 using Akka.Actor;
 using Akka.Event;
 using Akka.Persistence;
@@ -23,7 +22,7 @@ namespace InventoryManagement.Domain.Book
             {
                 var bookCreated = new BookCreated
                 (
-                    id: Guid.Parse(PersistenceId),
+                    id: createBook.Id,
                     title: createBook.Title,
                     author: createBook.Author,
                     tags: createBook.Tags,
