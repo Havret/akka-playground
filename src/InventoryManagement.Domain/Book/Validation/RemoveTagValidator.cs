@@ -7,7 +7,7 @@ using InventoryManagement.Contact.Dto;
 
 namespace InventoryManagement.Domain.Book.Validation
 {
-    public class RemoveTagValidator : AbstractValidator<RemoveTag>
+    public class RemoveTagValidator : AbstractValidator<RemoveTag>, IDeferredValidator
     {
         public RemoveTagValidator()
         {

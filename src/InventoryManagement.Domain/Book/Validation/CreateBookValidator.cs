@@ -6,7 +6,7 @@ using InventoryManagement.Contact.Dto;
 
 namespace InventoryManagement.Domain.Book.Validation
 {
-    public class CreateBookValidator : AbstractValidator<CreateBook>
+    public class CreateBookValidator : AbstractValidator<CreateBook>, IDeferredValidator
     {
         public CreateBookValidator()
         {

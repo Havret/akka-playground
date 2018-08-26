@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace InventoryManagement.Domain.Book.Validation
 {
-    public class AddTagValidator : AbstractValidator<AddTag>
+    public class AddTagValidator : AbstractValidator<AddTag>, IDeferredValidator
     {
         public AddTagValidator()
         {
