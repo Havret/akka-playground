@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "src\Infra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryManagement.Domain", "src\InventoryManagement.Domain\InventoryManagement.Domain.csproj", "{46836D9E-C25D-4419-93E2-9C02A6027DE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagement.Contact", "src\InventoryManagement.Contact\InventoryManagement.Contact.csproj", "{EECD7D79-C57E-42C4-9471-CD1407A5EFF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryManagement.Contact", "src\InventoryManagement.Contact\InventoryManagement.Contact.csproj", "{EECD7D79-C57E-42C4-9471-CD1407A5EFF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Service", "src\Storage.Service\Storage.Service.csproj", "{7679D2D7-90AD-44F2-A6CF-FC7367A2A288}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{EECD7D79-C57E-42C4-9471-CD1407A5EFF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EECD7D79-C57E-42C4-9471-CD1407A5EFF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EECD7D79-C57E-42C4-9471-CD1407A5EFF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7679D2D7-90AD-44F2-A6CF-FC7367A2A288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7679D2D7-90AD-44F2-A6CF-FC7367A2A288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7679D2D7-90AD-44F2-A6CF-FC7367A2A288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7679D2D7-90AD-44F2-A6CF-FC7367A2A288}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

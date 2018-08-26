@@ -4,7 +4,9 @@ using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using InventoryManagement.Contact.Query;
 
 namespace ApiGateway.Controllers
 {
@@ -13,10 +15,12 @@ namespace ApiGateway.Controllers
     public class BooksController : Controller
     {
         private readonly IActorRef _bookActor;
+        private readonly IActorRef _bookQueryHandler;
 
-        public BooksController(CreateBookActor createBookActor)
+        public BooksController(CreateBookActor createBookActor, CreateBookQueryHandler createBookQueryHandler)
         {
             _bookActor = createBookActor();
+            _bookQueryHandler = createBookQueryHandler();
         }
 
         [HttpPost]
@@ -32,6 +36,13 @@ namespace ApiGateway.Controllers
         {
             var bookDto = await _bookActor.Ask<BookDto>(new ShardEnvelope(id.ToString(), InventoryManagement.Contact.Query.GetBook.Instance));
             return Ok(bookDto);
+        }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetBooks()
+        {
+            var books = await _bookQueryHandler.Ask<IEnumerable<BookDto>>(new GetBooks());
+            return Ok(books);
         }
     }
 }

@@ -20,8 +20,9 @@ namespace InventoryManagement.Domain.Book.Validation
             var materializer = ActorMaterializer.Create(Context.System);
             var eventsByTag = queries.EventsByTag(nameof(BookCreated));
 
+            var self = Self;
             eventsByTag.RunForeach(envelope => envelope.Event.Match()
-                .With<BookCreated>(Self.Tell), materializer);
+                .With<BookCreated>(self.Tell), materializer);
 
             Receive<BookCreated>(bookCreated =>
             {
