@@ -6,18 +6,19 @@ using Infrastructure;
 using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
 using InventoryManagement.Contact.Query;
+using System;
 
 namespace InventoryManagement.Domain.Book.Validation
 {
     public class BookValidationProxyActor : ReceiveActor, IWithUnboundedStash
     {
-        private readonly IActorRef _bookNameGuard;
+        private readonly IActorRef _bookTitleGuard;
         private readonly IActorRef _bookActor;
         private readonly ILoggingAdapter _logger = Context.GetLogger();
 
-        public BookValidationProxyActor(IActorRef bookNameGuard)
+        public BookValidationProxyActor(IActorRef bookTitleGuard)
         {
-            _bookNameGuard = bookNameGuard;
+            _bookTitleGuard = bookTitleGuard;
             _bookActor = Context.ActorOf(Props.Create<BookActor>(), Context.Self.Path.Name);
             Become(Idle);
         }
@@ -28,59 +29,48 @@ namespace InventoryManagement.Domain.Book.Validation
         {
             Receive<CreateBook>(createBook =>
             {
-                _bookNameGuard.Tell(new BookNameGuardActor.CheckBookTitleAvailability(createBook.Title));
+                _bookTitleGuard.Tell(new BookNameGuardActor.CheckBookTitleAvailability(createBook.Title));
                 _bookActor.Tell(GetBook.Instance);
-                Become(ValidateCreateBook(createBook, new CreateBookValidator()));
+
+                Become(Validate(createBook, new CreateBookValidator(), FillValidator));
+
+                Case FillValidator(Case match, CreateBookValidator validator) => match
+                    .With<BookNameGuardActor.BookTitleAvailability>(x => validator.BookTitleAvailable = x.IsAvailable)
+                    .With<BookDto>(x => validator.Book = x);
             });
 
             Receive<AddTag>(addTag =>
             {
                 _bookActor.Tell(GetBook.Instance);
-                Become(ValidateAddTag(addTag, new AddTagValidator()));
+
+                Become(Validate(addTag, new AddTagValidator(), FillValidator));
+
+                Case FillValidator(Case match, AddTagValidator validator) => match
+                    .With<BookDto>(x => validator.Book = x);
             });
 
             Receive<RemoveTag>(removeTag =>
             {
                 _bookActor.Tell(GetBook.Instance);
-                Become(ValidateRemoveTag(removeTag, new RemoveTagValidator()));
+
+                Become(Validate(removeTag, new RemoveTagValidator(), FillValidator));
+
+                Case FillValidator(Case match, RemoveTagValidator validator) => match
+                    .With<BookDto>(x => validator.Book = x);
             });
 
             ReceiveAny(Forward);
         }
 
-        private UntypedReceive ValidateCreateBook(CreateBook command, CreateBookValidator validator) => message =>
-         {
-             message.Match()
-                 .With<BookNameGuardActor.BookTitleAvailability>(x => validator.BookTitleAvailable = x.IsAvailable)
-                 .With<BookDto>(x => validator.Book = x)
-                 .With<ICommand>(_ => Stash.Stash())
-                 .Default(Forward);
-
-             Validate(command, validator);
-         };
-
-        private UntypedReceive ValidateAddTag(AddTag command, AddTagValidator validator) => message =>
+        private UntypedReceive Validate<TCommand, TValidator>(TCommand command, TValidator validator,
+            Func<Case, TValidator, Case> fillValidator)
+            where TValidator : IValidator<TCommand>, IDeferredValidator
+            where TCommand : ICommand => message =>
         {
-            message.Match()
-                .With<BookDto>(x => validator.Book = x)
+            fillValidator(message.Match(), validator)
                 .With<ICommand>(_ => Stash.Stash())
                 .Default(Forward);
 
-            Validate(command, validator);
-        };
-
-        private UntypedReceive ValidateRemoveTag(RemoveTag command, RemoveTagValidator validator) => message =>
-        {
-            message.Match()
-                .With<BookDto>(x => validator.Book = x)
-                .With<ICommand>(_ => Stash.Stash())
-                .Default(Forward);
-
-            Validate(command, validator);
-        };
-
-        private void Validate<TCommand, TValidator>(TCommand command, TValidator validator) where TValidator : IValidator<TCommand>, IDeferredValidator where TCommand: ICommand
-        {
             if (validator.IsReady)
             {
                 var result = validator.Validate(command);
@@ -92,9 +82,9 @@ namespace InventoryManagement.Domain.Book.Validation
                 Stash.UnstashAll();
                 Become(Idle);
             }
-        }
+        };
 
         private void Forward(object message) => _bookActor.Forward(message);
-        
+
     }
 }
