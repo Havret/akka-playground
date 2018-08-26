@@ -1,6 +1,7 @@
 ﻿using Akka;
 using Akka.Actor;
 using Akka.Event;
+using FluentValidation;
 using Infrastructure;
 using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
@@ -55,17 +56,7 @@ namespace InventoryManagement.Domain.Book.Validation
                  .With<ICommand>(_ => Stash.Stash())
                  .Default(Forward);
 
-             if (validator.IsReady)
-             {
-                 var result = validator.Validate(command);
-                 if (result.IsValid)
-                     Forward(command);
-                 else
-                     _logger.Info(result.ToString());
-
-                 Stash.UnstashAll();
-                 Become(Idle);
-             }
+             Validate(command, validator);
          };
 
         private UntypedReceive ValidateAddTag(AddTag command, AddTagValidator validator) => message =>
@@ -75,17 +66,7 @@ namespace InventoryManagement.Domain.Book.Validation
                 .With<ICommand>(_ => Stash.Stash())
                 .Default(Forward);
 
-            if (validator.IsReady)
-            {
-                var result = validator.Validate(command);
-                if (result.IsValid)
-                    Forward(command);
-                else
-                    _logger.Info(result.ToString());
-
-                Stash.UnstashAll();
-                Become(Idle);
-            }
+            Validate(command, validator);
         };
 
         private UntypedReceive ValidateRemoveTag(RemoveTag command, RemoveTagValidator validator) => message =>
@@ -95,6 +76,11 @@ namespace InventoryManagement.Domain.Book.Validation
                 .With<ICommand>(_ => Stash.Stash())
                 .Default(Forward);
 
+            Validate(command, validator);
+        };
+
+        private void Validate<TCommand, TValidator>(TCommand command, TValidator validator) where TValidator : IValidator<TCommand>, IDeferredValidator where TCommand: ICommand
+        {
             if (validator.IsReady)
             {
                 var result = validator.Validate(command);
@@ -106,7 +92,7 @@ namespace InventoryManagement.Domain.Book.Validation
                 Stash.UnstashAll();
                 Become(Idle);
             }
-        };
+        }
 
         private void Forward(object message) => _bookActor.Forward(message);
         
