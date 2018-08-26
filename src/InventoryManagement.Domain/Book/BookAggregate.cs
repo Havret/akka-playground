@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace InventoryManagement.Domain.Book
 {
-    public class BookAggregate : ICloneable
+    public class BookAggregate
     {
         public Guid Id { get; private set; }
         public string Title { get; private set; }
@@ -14,7 +14,7 @@ namespace InventoryManagement.Domain.Book
         public decimal Cost { get; private set; }
         public int InventoryAmount { get; private set; }
 
-        public void Apply(BookCreated bookCreated)
+        internal void Apply(BookCreated bookCreated)
         {
             Id = bookCreated.Id;
             Title = bookCreated.Title;
@@ -24,14 +24,10 @@ namespace InventoryManagement.Domain.Book
             InventoryAmount = bookCreated.InventoryAmount;
         }
 
-        public void Apply(TagAdded bookCreated)
-        {
-            Tags = Tags.Concat(new[] { bookCreated.Tag }).ToList();
-        }
+        internal void Apply(TagAdded bookCreated) =>
+            Tags = Tags.Concat(new[] { bookCreated.Tag.ToLower() }).ToList();
 
-        public object Clone()
-        {
-            return MemberwiseClone();
-        }
+        internal void Apply(TagRemoved tagRemoved) => 
+            Tags = Tags.Where(x => !string.Equals(x, tagRemoved.Tag.ToLower())).ToList();
     }
 }

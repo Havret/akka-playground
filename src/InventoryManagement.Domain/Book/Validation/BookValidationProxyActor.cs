@@ -38,6 +38,12 @@ namespace InventoryManagement.Domain.Book.Validation
                 Become(ValidateAddTag(addTag, new AddTagValidator()));
             });
 
+            Receive<RemoveTag>(removeTag =>
+            {
+                _bookActor.Tell(GetBook.Instance);
+                Become(ValidateRemoveTag(removeTag, new RemoveTagValidator()));
+            });
+
             ReceiveAny(Forward);
         }
 
@@ -63,6 +69,26 @@ namespace InventoryManagement.Domain.Book.Validation
          };
 
         private UntypedReceive ValidateAddTag(AddTag command, AddTagValidator validator) => message =>
+        {
+            message.Match()
+                .With<BookDto>(x => validator.Book = x)
+                .With<ICommand>(_ => Stash.Stash())
+                .Default(Forward);
+
+            if (validator.IsReady)
+            {
+                var result = validator.Validate(command);
+                if (result.IsValid)
+                    Forward(command);
+                else
+                    _logger.Info(result.ToString());
+
+                Stash.UnstashAll();
+                Become(Idle);
+            }
+        };
+
+        private UntypedReceive ValidateRemoveTag(RemoveTag command, RemoveTagValidator validator) => message =>
         {
             message.Match()
                 .With<BookDto>(x => validator.Book = x)

@@ -14,10 +14,11 @@ namespace InventoryManagement.Service
         {
             switch (evt)
             {
-                case BookCreated bookCreated:
-                    return new Tagged(bookCreated, new[] { nameof(BookCreated), "book" });
-                case TagAdded tagAdded:
-                    return new Tagged(tagAdded, new[] { "book" });
+                case BookCreated _:
+                    return new Tagged(evt, new[] { nameof(BookCreated), "book" });
+                case TagAdded _:
+                case TagRemoved _:
+                    return new Tagged(evt, new[] { "book" });
                 default:
                     return evt;
             }
