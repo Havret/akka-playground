@@ -38,11 +38,19 @@ namespace ApiGateway.Controllers
             return Ok(bookDto);
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> GetBooks()
         {
             var books = await _bookQueryHandler.Ask<IEnumerable<BookDto>>(new GetBooks());
             return Ok(books);
+        }
+
+        [HttpPost("{id}/tag")]
+        public IActionResult AddTag(Guid id, AddTag command)
+        {
+            command = command.WithId(id);
+            _bookActor.Tell(new ShardEnvelope(command.Id.ToString(), command));
+            return Accepted();
         }
     }
 }

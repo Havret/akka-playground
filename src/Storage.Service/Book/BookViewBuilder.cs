@@ -8,6 +8,8 @@ using Akka.Streams.Util;
 using InventoryManagement.Contact.Events;
 using MongoDB.Driver;
 using Storage.Service.ResumableProjection;
+using System;
+using System.Linq.Expressions;
 
 namespace Storage.Service.Book
 {
@@ -28,7 +30,7 @@ namespace Storage.Service.Book
                 SqlReadJournal queries = PersistenceQuery.Get(Context.System)
                     .ReadJournalFor<SqlReadJournal>(SqlReadJournal.Identifier);
                 var materializer = ActorMaterializer.Create(Context.System);
-                var eventsByTag = queries.EventsByTag(nameof(BookCreated), new Sequence(option.Value));
+                var eventsByTag = queries.EventsByTag("book", new Sequence(option.Value));
                 eventsByTag
                     .SelectAsync(1, x => self.Ask(x))
                     .Select(x => (Sequence)x)
@@ -49,10 +51,25 @@ namespace Storage.Service.Book
 
                     var updateOptions = new UpdateOptions { IsUpsert = true };
 
-                    _storageContext.Books.UpdateOneAsync(x => x.Id == bookCreated.Id, updateDefinition, updateOptions).PipeTo(Sender,
-                        Self, () => envelope.Offset, exception => new Status.Failure(exception));
-                }));
+                    _storageContext.Books.UpdateOneAsync(x => x.Id == bookCreated.Id, updateDefinition, updateOptions)
+                        .PipeTo(Sender,
+                            Self, () => envelope.Offset, exception => new Status.Failure(exception));
+                })
+                .With<TagAdded>(tagAdded =>
+                {
+                    var updateDefinition = new UpdateDefinitionBuilder<BookReadModel>()
+                        .Push(model => model.Tags, tagAdded.Tag)
+                        .Set(model => model.SequenceNr, envelope.SequenceNr);
+
+                    _storageContext.Books
+                        .FindOneAndUpdateAsync(ShouldBeApplied(tagAdded.Id, envelope.SequenceNr), updateDefinition)
+                        .PipeTo(Sender, Self, () => envelope.Offset, exception => new Status.Failure(exception));
+                })
+            );
         }
+
+        private static Expression<Func<BookReadModel, bool>> ShouldBeApplied(Guid id, long sequenceNr) =>
+            x => x.Id == id && x.SequenceNr == sequenceNr - 1;
 
         protected override void PreStart()
         {

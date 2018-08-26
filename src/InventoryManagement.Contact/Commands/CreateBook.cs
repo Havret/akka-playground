@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Infrastructure;
+using System;
 using System.Collections.Generic;
 
 namespace InventoryManagement.Contact.Commands
 {
-    public class CreateBook
+    public class CreateBook : ICommand
     {
         public CreateBook(string title, string author, IReadOnlyList<string> tags, decimal cost, int inventoryAmount)
         {
@@ -23,7 +24,7 @@ namespace InventoryManagement.Contact.Commands
 
         public CreateBook WithId(Guid id)
         {
-            var clone = (CreateBook) this.MemberwiseClone();
+            var clone = (CreateBook)MemberwiseClone();
             clone.Id = id;
             return clone;
         }

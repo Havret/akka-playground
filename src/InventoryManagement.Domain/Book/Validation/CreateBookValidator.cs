@@ -12,7 +12,7 @@ namespace InventoryManagement.Domain.Book.Validation
         {
             RuleFor(x => x.Id)
                 .NotEmpty()
-                .Must(_ => Book.Value.Id == Guid.Empty).WithMessage("Book already exists");
+                .Must(_ => Book.Value.Id == Guid.Empty).WithMessage("Book already exists.");
 
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Title is required.")

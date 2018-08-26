@@ -1,6 +1,7 @@
-﻿using System;
+﻿using InventoryManagement.Contact.Events;
+using System;
 using System.Collections.Generic;
-using InventoryManagement.Contact.Events;
+using System.Linq;
 
 namespace InventoryManagement.Domain.Book
 {
@@ -21,6 +22,11 @@ namespace InventoryManagement.Domain.Book
             Tags = bookCreated.Tags;
             Cost = bookCreated.Cost;
             InventoryAmount = bookCreated.InventoryAmount;
+        }
+
+        public void Apply(TagAdded bookCreated)
+        {
+            Tags = Tags.Concat(new[] { bookCreated.Tag }).ToList();
         }
 
         public object Clone()
