@@ -18,14 +18,15 @@ namespace Storage.Service.ResumableProjection
         {
             var updateDefinition = Builders<ProjectionOffset>.Update.Set(x => x.Offset, offset);
             var updateOptions = new UpdateOptions { IsUpsert = true };
-            await _storageContext.ProjectionOffsets.UpdateOneAsync(x => x.Identifier == identifier, updateDefinition, updateOptions);
+            await _storageContext.ProjectionOffsets.UpdateOneAsync(x => x.Id == identifier, updateDefinition, updateOptions);
             return true;
         }
 
         public async Task<Option<long>> FetchLatestOffset(string identifier)
         {
-            var projectionOffset = await _storageContext.ProjectionOffsets.Find(x => x.Identifier == identifier).FirstOrDefaultAsync();
-            return projectionOffset?.Offset ?? Option<long>.None;
+            var cursor = await _storageContext.ProjectionOffsets.FindAsync(x => x.Id == identifier);
+            var offset = await cursor.FirstOrDefaultAsync();
+            return offset?.Offset ?? Option<long>.None;
         }
     }
 }

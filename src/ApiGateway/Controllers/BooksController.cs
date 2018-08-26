@@ -39,9 +39,9 @@ namespace ApiGateway.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBooks()
+        public async Task<IActionResult> GetBooks([FromQuery(Name = "tag")] string tag)
         {
-            var books = await _bookQueryHandler.Ask<IEnumerable<BookDto>>(new GetBooks());
+            var books = await _bookQueryHandler.Ask<IEnumerable<BookDto>>(new GetBooks(tag));
             return Ok(books);
         }
 
