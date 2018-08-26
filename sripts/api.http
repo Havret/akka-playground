@@ -5,7 +5,7 @@ POST {{api}}/api/books
 content-type: application/json
 
 {
-    "title": "New Awesome Book2",
+    "title": "New dfghjhj",
     "author": "Marian Bubak",
     "tags": ["new", "tag"],
     "cost": 500,
@@ -14,3 +14,7 @@ content-type: application/json
 ### Get book
 @bookId = 5db6f8c0-4f87-4c33-bc80-f20cdf4a2f4a
 GET {{api}}/api/books/{{bookId}}
+
+
+### Get books
+GET {{api}}/api/books

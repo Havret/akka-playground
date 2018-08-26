@@ -30,10 +30,7 @@ namespace InventoryManagement.Service
             return true;
         }
 
-        public Task Stop()
-        {
-            return CoordinatedShutdown.Get(ClusterSystem).Run();
-        }
+        public Task Stop() => CoordinatedShutdown.Get(ClusterSystem).Run();
 
         public Task WhenTerminated => ClusterSystem.WhenTerminated;
     }
