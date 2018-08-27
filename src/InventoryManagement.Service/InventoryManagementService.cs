@@ -4,7 +4,6 @@ using Akka.Cluster.Sharding;
 using Infrastructure.Config;
 using Infrastructure.Sharding;
 using InventoryManagement.Domain.Book;
-using InventoryManagement.Domain.Book.Validation;
 
 namespace InventoryManagement.Service
 {
@@ -22,7 +21,7 @@ namespace InventoryManagement.Service
             var clusterSharding = ClusterSharding.Get(ClusterSystem);
             clusterSharding.Start(
                 typeName: nameof(BookActor),
-                entityProps: Props.Create(() => new BookValidationProxyActor(bookNameGuard)), 
+                entityProps: Props.Create(() => new BookValidationActor(bookNameGuard)), 
                 settings: ClusterShardingSettings.Create(ClusterSystem).WithRole("InventoryManagement"),
                 messageExtractor: new CustomMessageExtractor()
             );

@@ -7,7 +7,7 @@ using Akka.Persistence.Query.Sql;
 using Akka.Streams;
 using InventoryManagement.Contact.Events;
 
-namespace InventoryManagement.Domain.Book.Validation
+namespace InventoryManagement.Domain.Book
 {
     public class BookNameGuardActor : ReceiveActor
     {
