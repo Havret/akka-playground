@@ -1,15 +1,15 @@
-﻿using Akka.Streams.Util;
+﻿using System;
+using System.Linq;
+using Akka.Streams.Util;
 using FluentValidation;
 using InventoryManagement.Contact.Commands;
 using InventoryManagement.Contact.Dto;
-using System;
-using System.Linq;
 
-namespace InventoryManagement.Domain.Book.Validation
+namespace InventoryManagement.Domain.Book.Validators
 {
-    public class AddTagValidator : AbstractValidator<AddTag>, IDeferredValidator
+    public class RemoveTagValidator : AbstractValidator<RemoveTag>, IDeferredValidator
     {
-        public AddTagValidator()
+        public RemoveTagValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty()
@@ -17,10 +17,11 @@ namespace InventoryManagement.Domain.Book.Validation
 
             RuleFor(x => x.Tag)
                 .NotEmpty()
-                .Must(x => !Book.Value.Tags.Contains(x, StringComparer.CurrentCultureIgnoreCase)).WithMessage(x => $"Book {x.Id} already has tag {x.Tag}.");
+                .Must(x => Book.Value.Tags.Contains(x, StringComparer.CurrentCultureIgnoreCase)).WithMessage(x => $"Cannot remove {x.Tag} from book {x.Id}. Tag not present.");
         }
 
         public bool IsReady => Book.HasValue;
+        
         public Option<BookDto> Book { private get; set; }
     }
 }
