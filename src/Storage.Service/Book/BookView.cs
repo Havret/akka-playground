@@ -22,28 +22,22 @@ namespace Storage.Service.Book
                 if (!string.IsNullOrEmpty(query.Tag))
                     filterDefinition &= new ExpressionFilterDefinition<BookReadModel>(x => x.Tags.Contains(query.Tag));
 
-                FindBooks(filterDefinition).PipeTo(recipient: Self, sender: Sender);
-            });
-
-            Receive<IEnumerable<BookReadModel>>(books =>
-            {
-                var bookDtos = books.Select(x => new BookDto
-                (
-                    id: x.Id,
-                    title: x.Title,
-                    author: x.Author,
-                    cost: x.Cost,
-                    tags: x.Tags
-                )).ToArray();
-
-                Sender.Tell(bookDtos);
+                FindBooks(filterDefinition).PipeTo(recipient: Sender, sender: Self);
             });
         }
 
-        private async Task<IEnumerable<BookReadModel>> FindBooks(FilterDefinition<BookReadModel> filterDefinition)
+        private async Task<IEnumerable<BookDto>> FindBooks(FilterDefinition<BookReadModel> filterDefinition)
         {
             var result = await _storageContext.Books.FindAsync(filterDefinition);
-            return await result.ToListAsync();
+            var books = await result.ToListAsync();
+            return books.Select(x => new BookDto
+            (
+                id: x.Id,
+                title: x.Title,
+                author: x.Author,
+                cost: x.Cost,
+                tags: x.Tags
+            )).ToArray();
         }
     }
 }
